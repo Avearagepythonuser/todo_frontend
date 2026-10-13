@@ -4,8 +4,8 @@ import { Label } from "@heroui/react";
 import { TextField } from "@heroui/react";
 import { useState } from "react";
 
-const myUsername = "Kim Jong Un"
-const myPassword = "South Korea Bad"
+const myUsername = "Akos"
+const myPassword = "ASD"
 
 export function Login({setIsLoggedIn}) {
     const [username, setUsername] = useState("")
