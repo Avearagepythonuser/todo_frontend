@@ -3,18 +3,25 @@ import { Button } from "@heroui/react";
 import { Label } from "@heroui/react";
 import { TextField } from "@heroui/react";
 import { useState } from "react";
-
-const myUsername = "Akos"
-const myPassword = "ASD"
+import { login } from "../api";
 
 export function Login({setIsLoggedIn}) {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [msg, setMsg] = useState("");
 
-    const handleLogin = () => {
-        if (username == myUsername && password == myPassword) setIsLoggedIn(true)
-        else setMsg("Hibás felhasználónév vagy jelszó!")
+    const handleLogin = async () => {
+        //if (username == myUsername && password == myPassword) setIsLoggedIn(true)
+        //else setMsg("Hibás felhasználónév vagy jelszó!")
+        try {
+            const data = await login(username, password)
+            console.log(data)
+            setIsLoggedIn(data.success)
+        } catch (err) {
+            console.log(err)
+            setMsg(err.response?.data?.msg || "Nem sikerült kapcsolódni a szerverhez")
+        }
+
     }
 
    return (
