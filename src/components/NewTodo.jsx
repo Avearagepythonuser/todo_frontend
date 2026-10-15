@@ -16,7 +16,7 @@ export function NewTodo({handleAdd}) {
             <input type="text" 
                 placeholder="Új teendő..."
                 value={newTask}
-                className="border rounded p-3 flex-1 bg-blue-500"
+                className="border rounded p-3 flex-1 bg-blue-200 text-black"
                 onChange={(e)=> setNewTask(e.target.value)}
             />
             <Button onClick={handleSubmit}>

@@ -3,7 +3,7 @@ import { MyTodos } from "./components/MyTodos"
 import { Login } from "./components/Login";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   return (
     <div className="bg-blue-950 h-full">

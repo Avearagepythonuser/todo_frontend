@@ -1,36 +1,48 @@
 import { useState } from "react";
-import { todosData } from "../data.js"
+//import { todosData } from "../data.js"
 import { FaTrashAlt } from "react-icons/fa";
 import { Button } from "@heroui/react";
 import { FaCheck } from "react-icons/fa";
 import { NewTodo } from "./NewTodo.jsx";
 import { useEffect } from "react";
 import { IoIosLogOut } from "react-icons/io";
+import { addTodo, deleteTodo, patchTodo, todosGet } from "../api.js";
+import { Message } from "./Message.jsx";
 
 export function MyTodos({setIsLoggedIn}) {
-    const [data, setData] = useState(todosData);
+    const [data, setData] = useState(null);
     const [remaining, setRemaining] = useState(0);
+    const [message, setMessage] = useState("")
 
     useEffect(() => {
+        todosGet().then(setData)
+    }, [])
+
+    useEffect(() => {
+        if (!data) return
         const count = data.filter(({done}) => !done).length
         setRemaining(count)
     }, [data])
 
-    const handleDelete = (id) => {
-        setData(prev=> prev.filter(obj =>obj.id!=id))
+    const handleDelete = async (id) => {
+        setMessage("")
+        const res = await deleteTodo(id)
+        setData(prev=>prev.filter(obj=>obj.id != id))
+        setMessage(res.msg)
     }
 
-    const handleCheck = (id) => {
-        setData(prev=>prev.map(obj=> obj.id == id ? {...obj, done: !obj.done} : obj))
+    const handleCheck = async (id) => {
+        setMessage("")
+        const res = await patchTodo(id)
+        todosGet().then(setData)
+        setMessage(res.msg)
     }
 
-    const handleAdd = (description) => {
-        const newTodo = {
-            id: Date.now(),
-            description,
-            done: false
-        }
-        setData(prev=>[...prev, newTodo])
+    const handleAdd = async (task) => {
+        setMessage("")
+        const res = await addTodo(task);
+        todosGet().then(setData)
+        setMessage(res.msg)
     }
 
     return (
@@ -38,13 +50,13 @@ export function MyTodos({setIsLoggedIn}) {
             <h2 className="p-3 text-center font-bold">My todos</h2>
             <NewTodo handleAdd={handleAdd}/>
             <ul className="flex flex-col gap-3 shadow-md ">
-                {data.map(({id, description, done}) => 
+                {data && data.map(({id, task, complete}) => 
                     <li key={id} className="flex justify-between p-5 bg-blue-500">
-                        <Button className={done ? "bg-green-600": "bg-white"} isIconOnly variant="tertiary" onClick={() => handleCheck(id)}>
-                            <FaCheck color={done ? "green" : "gray"}/>
+                        <Button className={complete ? "bg-green-600": "bg-white"} isIconOnly variant="tertiary" onClick={() => handleCheck(id)}>
+                            <FaCheck color={complete ? "green" : "gray"}/>
                         </Button>
-                        <div style={{textDecoration: done ? "line-through" : "none"}}>
-                            {description}
+                        <div style={{textDecoration: complete ? "line-through" : "none"}}>
+                            {task}
                         </div>
                         <Button isIconOnly variant="danger" onClick={() => handleDelete(id)}>
                             <FaTrashAlt/>
@@ -53,12 +65,14 @@ export function MyTodos({setIsLoggedIn}) {
                 )}
             </ul>
             <div className="font-bold">
-                { remaining != 0 ? "Elvégzetlen feladatok: " + remaining : "Nincs elvégzetlen feladat"} 
+                { remaining != 0 ? "Elvégzetlen feladatok: " + remaining : "Nincs több teendő"} 
             </div>
 
             <Button onClick={() => setIsLoggedIn(false)} className="fixed top-2 right-2 bg-ind">
                 <IoIosLogOut />Kijelentkezés
             </Button>
+            {/* <div>{message}</div> */}
+            <Message message={message}/>
         </div>
     )
 }
